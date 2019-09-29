@@ -16,8 +16,10 @@ final case class NonTerminalSymbol(ruleName: String) extends Symbol {
   override def repr: String = ruleName
 }
 
-final case class TerminalSymbol(r: Regex) extends Symbol { //r should be a regex to match a single character
+case class TerminalSymbol(r: Regex) extends Symbol { //r should be a regex to match a single character
   override def repr: String = s"'${r.pattern.toString}'"
+
+  def matches(input: String): Boolean = r.matches(input) //Terminal symbols can be extended to override this behavior if needed
 }
 
 

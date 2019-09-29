@@ -52,15 +52,23 @@ class EarleyChart(val grammar: Grammar, val input: String) {
   def accepts: Boolean = getLastStates.nonEmpty
 
   // Util function
-  def repr(): String = {
+  def repr(f: EarleyState => String): String = {
     val s = new StringBuilder()
     S.zipWithIndex.foreach(p => {
-      val (i, ruleIndex) = p
-      s.append("\n---- " + ruleIndex + " ---\n")
-      i.foreach(earleyItem => {
-        s.append(earleyItem.repr + '\n')
+      val (set, i) = p
+      s.append("\n---- " + i + " ---\n")
+      set.foreach(earleyItem => {
+        s.append(f(earleyItem))
       })
     })
     s.toString()
+  }
+
+  def repr(): String = {
+    repr(earleyState => earleyState.repr + '\n')
+  }
+
+  def completeRepr(): String = {
+    repr(earleyState => earleyState.completeRepr + '\n')
   }
 }

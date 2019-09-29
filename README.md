@@ -94,10 +94,6 @@ A   ->B ->  b
 This algorithm will work for ambiguous grammars, but will only return one of the possible parse trees from the possible parses.
 
 ### Improvements
-The algorithm I used was published in Parsing: A practical guide 1st edition, which was published in 1990 Elizabeth Scott in 2008 published a paper on how to have this algorithm work better for ambiguous grammars
-I also used a search from the end to the start, which I think will match the shortest match, not the longest.
-I haven't figured out how I want to determine which tree to output when there is an ambiguous grammar. 
-Also, it might not be handling right recursive grammars properly
 
 ## Handling Ɛ productions 
 TODO!

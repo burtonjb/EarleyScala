@@ -1,5 +1,7 @@
 package earleyscala
 
+import scala.collection.mutable.ArrayBuffer
+
 /*
 Each state is a tuple (X → α • β, i), consisting of
 * the production currently being matched (X → α β)
@@ -9,7 +11,17 @@ Each state is a tuple (X → α • β, i), consisting of
 * The second set of fields (the curried fields) are just used to store more debugging information
 */
 case class EarleyState(rule: Rule, dotPosition: Int, startPosition: Int) //scala case class trick - only these values will be used for equals, hashcode and toString
-                      (val endPosition: Int, val createdFrom: String) { //These values are for displaying the state, but are not part of the original definition for the E.S.
+                      (val endPosition: Int, val createdFrom: String) //These values are for displaying the state, but are not part of the original definition for the E.S.
+{
+  private val _predecessors = new ArrayBuffer[Pointer]()
+  def predecessors: ArrayBuffer[Pointer] = _predecessors
+
+  private val _decendents = new ArrayBuffer[Pointer]()
+  def decendents: ArrayBuffer[Pointer] = _decendents
+
+  def nextSymbol: Option[Symbol] = {
+    rule.symbols.lift(dotPosition)
+  }
 
   def repr: String = {
     val sb = new StringBuilder
@@ -24,7 +36,36 @@ case class EarleyState(rule: Rule, dotPosition: Int, startPosition: Int) //scala
     sb.toString
   }
 
+  def cRepr: String = {
+    s"${repr}\t[${endPosition}]\t${createdFrom}\t"
+  }
+
+  def completeRepr: String = {
+    val sb = new StringBuilder
+    sb.append(cRepr)
+    sb.append("{")
+    predecessors.foreach(p => sb.append(p.to.cRepr + "; "))
+    sb.append("}")
+    sb.toString
+  }
+
   def complete: Boolean = {
     rule.symbols.size == dotPosition
   }
+
+  override def toString: String = {
+    repr
+  }
 }
+
+//eventually I need to convert these pointers into a SharedPackedParseForest (SPPF), to cap the time and space complexity to O(n^3)
+//See SPPF-Style Parsing From Earley Recognisers by Elizabeth Scott
+sealed trait Pointer {
+  val label: Int
+  val from: EarleyState
+  val to: EarleyState
+}
+
+final case class PredecessorPointer(label: Int, from: EarleyState, to: EarleyState) extends Pointer
+
+final case class ReductionPointer(label: Int, from: EarleyState, to: EarleyState) extends Pointer
