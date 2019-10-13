@@ -4,7 +4,7 @@ import earleyscala._
 import junit.framework.TestCase
 
 class testSimpleAmbiguousGrammar extends TestCase {
-  val TreeUtils = FullTreeUtils
+  val TreeUtils = new FullTreeUtils
 
   def testEScottExample2(): Unit = {
     //grammar from here: https://www.sciencedirect.com/science/article/pii/S1571066108001497 - Paper by Elizabeth Scott; the example 2 grammar
@@ -89,7 +89,7 @@ class testSimpleAmbiguousGrammar extends TestCase {
 
 
 class testSimpleAmbiguousGrammarDisambiguated extends TestCase {
-  val TreeUtils = DisambiguatingTreeUtils
+  val TreeUtils = new DisambiguatingTreeUtils
 
   def testEScottExample2(): Unit = {
     //grammar from here: https://www.sciencedirect.com/science/article/pii/S1571066108001497 - Paper by Elizabeth Scott; the example 2 grammar

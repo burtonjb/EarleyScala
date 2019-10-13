@@ -4,6 +4,8 @@ import earleyscala._
 import junit.framework.TestCase
 
 class testBasicNumericGrammar extends TestCase {
+  val TreeUtils = new FullTreeUtils
+
   def testBasicNumericGrammar_LeftRecursive: Unit = {
     val grammar = Grammar("number",
       List(
@@ -16,9 +18,9 @@ class testBasicNumericGrammar extends TestCase {
     val chart = earley.buildChart(input)
     val end = chart.getLastStates.head
 
-    FullTreeUtils.createLeaves(end, input)
+    TreeUtils.createLeaves(end, input)
     println()
-    FullTreeUtils.createTree(end, input)
+    TreeUtils.createTree(end, input)
     /*
           1
         number -> '[0-9]'
@@ -42,9 +44,9 @@ class testBasicNumericGrammar extends TestCase {
     val chart = earley.buildChart(input)
     val end = chart.getLastStates.head
 
-    FullTreeUtils.createLeaves(end, input)
+    TreeUtils.createLeaves(end, input)
     println()
-    FullTreeUtils.createTree(end, input)
+    TreeUtils.createTree(end, input)
     /*
       1
         2

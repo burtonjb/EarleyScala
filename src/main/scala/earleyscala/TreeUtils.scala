@@ -10,7 +10,7 @@ trait TreeUtils[T] {
   def createLeaves(root: EarleyState, input: String, depth: Int = 0): T
 }
 
-object FullTreeUtils extends TreeUtils[Unit] {
+class FullTreeUtils extends TreeUtils[Unit] {
   override def traversal(root: EarleyState, input: String, callback: (EarleyState, String, Int) => Unit, depth: Int = 0): Unit = {
     root.predecessors.reverse.foreach(p => {
       if (root.complete) traversal(p.to, input, callback, depth + 1)
@@ -27,7 +27,7 @@ object FullTreeUtils extends TreeUtils[Unit] {
     traversal(root, input, printLeaves)
   }
 
-  private def printTree(root: EarleyState, input: String, depth: Int): Unit = {
+  protected def printTree(root: EarleyState, input: String, depth: Int): Unit = {
     if (root.complete) {
       println("\t" * depth + root.rule.repr)
     } else if (root.rule.symbols(root.dotPosition).isInstanceOf[TerminalSymbol]) {
@@ -35,7 +35,7 @@ object FullTreeUtils extends TreeUtils[Unit] {
     }
   }
 
-  private def printLeaves(root: EarleyState, input: String, depth: Int): Unit = {
+  protected def printLeaves(root: EarleyState, input: String, depth: Int): Unit = {
     if (root.complete) {}
     else if (root.rule.symbols(root.dotPosition).isInstanceOf[TerminalSymbol]) {
       print(input.charAt(root.endPosition))
@@ -43,7 +43,7 @@ object FullTreeUtils extends TreeUtils[Unit] {
   }
 }
 
-object DisambiguatingTreeUtils extends TreeUtils[Unit] {
+class DisambiguatingTreeUtils extends FullTreeUtils {
   override def traversal(root: EarleyState, input: String, callback: (EarleyState, String, Int) => Unit, depth: Int = 0): Unit = {
     val children = root.predecessors.reverse
     disambiguate(children).foreach(p => {
@@ -61,27 +61,12 @@ object DisambiguatingTreeUtils extends TreeUtils[Unit] {
     traversal(root, input, printLeaves)
   }
 
-  private def disambiguate(children: mutable.Buffer[Pointer]): mutable.Buffer[Pointer] = {
+  protected def disambiguate(children: mutable.Buffer[Pointer]): mutable.Buffer[Pointer] = {
     //FIXME: pretty sure this will return incorrect results when a scan happens and then something completes.
     //Completes have a predecessorPointer and then a reductionPointer. A scan just has a predecessorPointer, so this will take the scan and then the first part of the complete, which will be wrong
     val b = children.groupBy(p => p.label).toList.flatMap(p => {
       p._2.take(2)
     })
     b.toBuffer
-  }
-
-  private def printTree(root: EarleyState, input: String, depth: Int): Unit = {
-    if (root.complete) {
-      println("\t" * depth + root.rule.repr)
-    } else if (root.rule.symbols(root.dotPosition).isInstanceOf[TerminalSymbol]) {
-      println("\t" * depth + input.charAt(root.endPosition))
-    }
-  }
-
-  private def printLeaves(root: EarleyState, input: String, depth: Int): Unit = {
-    if (root.complete) {}
-    else if (root.rule.symbols(root.dotPosition).isInstanceOf[TerminalSymbol]) {
-      print(input.charAt(root.endPosition))
-    }
   }
 }

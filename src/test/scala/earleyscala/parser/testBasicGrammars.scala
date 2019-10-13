@@ -4,7 +4,7 @@ import earleyscala._
 import junit.framework.TestCase
 
 class testBasicGrammars extends TestCase {
-  val TreeUtil = DisambiguatingTreeUtils
+  val TreeUtil = new DisambiguatingTreeUtils
 
   def testSimple: Unit = {
     val grammar = Grammar("S",

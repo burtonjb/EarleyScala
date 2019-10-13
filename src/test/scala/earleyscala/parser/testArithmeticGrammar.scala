@@ -4,7 +4,33 @@ import earleyscala._
 import junit.framework.TestCase
 
 class testArithmeticGrammar extends TestCase {
-  val TreeUtils = FullTreeUtils
+  val TreeUtils = new FullTreeUtils
+
+  def testGrammar(): Unit = {
+    //grammar from - https://en.wikipedia.org/wiki/Ambiguous_grammar#Addition_and_subtraction
+    val grammar = Grammar("A",
+      List(
+        Rule("A", List(NonTerminalSymbol("A"), TerminalSymbol("\\+"), NonTerminalSymbol("A"))),
+        Rule("A", List(TerminalSymbol("a")))
+      )
+    ) //A → A + A | a
+
+    val earley = Earley(grammar)
+    val input = "a+a"
+    val chart = earley.buildChart(input)
+    val end = chart.getLastStates.head
+    TreeUtils.createLeaves(end, input)
+    println()
+    TreeUtils.createTree(end, input)
+    /*
+        a
+      A -> 'a'
+      +
+        a
+      A -> 'a'
+    A -> A '\+' A
+    */
+  }
 
   def testBasicArithmeticGrammar: Unit = {
     //This grammar was taken off the wikipedia - https://en.wikipedia.org/wiki/Earley_parser#Example
