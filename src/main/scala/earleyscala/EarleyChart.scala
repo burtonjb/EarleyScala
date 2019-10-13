@@ -27,14 +27,6 @@ class EarleyChart(val grammar: Grammar, val input: String) {
     S(i)
   }
 
-  def getLastStates: List[EarleyState] = {
-    //This method will return no states if the recognizer did not accept the input string from the grammar
-    //The method will return 1 state for unambiguous grammars or 1-or-more states for ambiguous grammars if the recognizer accepts the input string
-    S.last.filter(state => {
-      state.rule.name == grammar.startRuleName && state.complete && state.startPosition == 0
-    }).toList
-  }
-
   def completedView: EarleyChart = {
     //returns a copy of the chart with just the completed items.
     val out = new EarleyChart(grammar, input)
@@ -51,6 +43,18 @@ class EarleyChart(val grammar: Grammar, val input: String) {
 
   def accepts: Boolean = getLastStates.nonEmpty
 
+  def getLastStates: List[EarleyState] = {
+    //This method will return no states if the recognizer did not accept the input string from the grammar
+    //The method will return 1 state for unambiguous grammars or 1-or-more states for ambiguous grammars if the recognizer accepts the input string
+    S.last.filter(state => {
+      state.rule.name == grammar.startRuleName && state.complete && state.startPosition == 0
+    }).toList
+  }
+
+  def repr(): String = {
+    repr(earleyState => earleyState.repr + '\n')
+  }
+
   // Util function
   def repr(f: EarleyState => String): String = {
     val s = new StringBuilder()
@@ -62,10 +66,6 @@ class EarleyChart(val grammar: Grammar, val input: String) {
       })
     })
     s.toString()
-  }
-
-  def repr(): String = {
-    repr(earleyState => earleyState.repr + '\n')
   }
 
   def completeRepr(): String = {

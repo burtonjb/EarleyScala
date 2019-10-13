@@ -1,30 +1,87 @@
 package earleyscala
 
-object TreeUtils {
-  def postOrderTraversal[T](root: EarleyState, input: String, f: (EarleyState, Int) => T, depth: Int = 0): T = {
-    root.predecessors.filter(p => true).foreach(p => postOrderTraversal(p.to, input, f, depth + 1))
-    f(root, depth)
+import scala.collection.mutable
+
+trait TreeUtils[T] {
+  def traversal(root: EarleyState, input: String, callback: (EarleyState, String, Int) => T, depth: Int = 0): T
+
+  def createTree(root: EarleyState, input: String, depth: Int = 0): T
+
+  def createLeaves(root: EarleyState, input: String, depth: Int = 0): T
+}
+
+object FullTreeUtils extends TreeUtils[Unit] {
+  override def traversal(root: EarleyState, input: String, callback: (EarleyState, String, Int) => Unit, depth: Int = 0): Unit = {
+    root.predecessors.reverse.foreach(p => {
+      if (root.complete) traversal(p.to, input, callback, depth + 1)
+      else traversal(p.to, input, callback, depth)
+    })
+    callback(root, input, depth)
   }
 
-  def printLeaves(root: EarleyState, input: String): String = {
-    //Useful for checking that the leaves of the tree match the input, but will not work if there's multiple derivations
-    val sb = new StringBuilder()
-    val f = (es: EarleyState, depth: Int) => {
-      if (es.createdFrom == "scan") sb.append(input.charAt(es.endPosition - 1))
-      sb
-    }
-    postOrderTraversal(root, input, f)
-    sb.toString
+  override def createTree(root: EarleyState, input: String, depth: Int): Unit = {
+    traversal(root, input, printTree)
   }
 
-  def printCompleteAndLeaves(root: EarleyState, input: String): String = {
-    val sb = new StringBuilder()
-    val f = (es: EarleyState, depth: Int) => {
-      if (es.createdFrom == "scan") sb.append("\t" * (depth + 1) + input.charAt(es.endPosition - 1) + s" (${es.startPosition}, ${es.endPosition}) [${depth + 1}]" + "\n")
-      if (es.complete) sb.append("\t" * depth + es.rule.repr + s" (${es.startPosition}, ${es.endPosition}) [$depth]" + "\n")
-      sb
+  override def createLeaves(root: EarleyState, input: String, depth: Int = 0): Unit = {
+    traversal(root, input, printLeaves)
+  }
+
+  private def printTree(root: EarleyState, input: String, depth: Int): Unit = {
+    if (root.complete) {
+      println("\t" * depth + root.rule.repr)
+    } else if (root.rule.symbols(root.dotPosition).isInstanceOf[TerminalSymbol]) {
+      println("\t" * depth + input.charAt(root.endPosition))
     }
-    postOrderTraversal(root, input, f)
-    sb.toString
+  }
+
+  private def printLeaves(root: EarleyState, input: String, depth: Int): Unit = {
+    if (root.complete) {}
+    else if (root.rule.symbols(root.dotPosition).isInstanceOf[TerminalSymbol]) {
+      print(input.charAt(root.endPosition))
+    }
+  }
+}
+
+object DisambiguatingTreeUtils extends TreeUtils[Unit] {
+  override def traversal(root: EarleyState, input: String, callback: (EarleyState, String, Int) => Unit, depth: Int = 0): Unit = {
+    val children = root.predecessors.reverse
+    disambiguate(children).foreach(p => {
+      if (root.complete) traversal(p.to, input, callback, depth + 1)
+      else traversal(p.to, input, callback, depth)
+    })
+    callback(root, input, depth)
+  }
+
+  override def createTree(root: EarleyState, input: String, depth: Int = 0): Unit = {
+    traversal(root, input, printTree)
+  }
+
+  override def createLeaves(root: EarleyState, input: String, depth: Int = 0): Unit = {
+    traversal(root, input, printLeaves)
+  }
+
+  private def disambiguate(children: mutable.Buffer[Pointer]): mutable.Buffer[Pointer] = {
+    //FIXME: pretty sure this will return incorrect results when a scan happens and then something completes.
+    //Completes have a predecessorPointer and then a reductionPointer. A scan just has a predecessorPointer, so this will take the scan and then the first part of the complete, which will be wrong
+    val b = children.groupBy(p => p.label).toList.flatMap(p => {
+      p._2.take(2)
+    })
+    b.toBuffer
+  }
+
+  private def printTree(root: EarleyState, input: String, depth: Int): Unit = {
+    if (root.complete) {
+      println("\t" * depth + root.rule.repr)
+    } else if (root.rule.symbols(root.dotPosition).isInstanceOf[TerminalSymbol]) {
+      println("\t" * depth + input.charAt(root.endPosition))
+    }
+  }
+
+  private def printLeaves(root: EarleyState, input: String, depth: Int): Unit = {
+    if (root.complete) {}
+    else if (root.rule.symbols(root.dotPosition).isInstanceOf[TerminalSymbol]) {
+      print(input.charAt(root.endPosition))
+    }
   }
 }

@@ -14,13 +14,24 @@ case class EarleyState(rule: Rule, dotPosition: Int, startPosition: Int) //scala
                       (val endPosition: Int, val createdFrom: String) //These values are for displaying the state, but are not part of the original definition for the E.S.
 {
   private val _predecessors = new ArrayBuffer[Pointer]()
-  def predecessors: ArrayBuffer[Pointer] = _predecessors
-
-  private val _decendents = new ArrayBuffer[Pointer]()
-  def decendents: ArrayBuffer[Pointer] = _decendents
 
   def nextSymbol: Option[Symbol] = {
     rule.symbols.lift(dotPosition)
+  }
+
+  def completeRepr: String = {
+    val sb = new StringBuilder
+    sb.append(cRepr)
+    sb.append("{")
+    predecessors.foreach(p => sb.append(p.to.cRepr + "; "))
+    sb.append("}")
+    sb.toString
+  }
+
+  def predecessors: ArrayBuffer[Pointer] = _predecessors
+
+  def cRepr: String = {
+    s"${repr}\t[${endPosition}]\t${createdFrom}\t"
   }
 
   def repr: String = {
@@ -33,19 +44,6 @@ case class EarleyState(rule: Rule, dotPosition: Int, startPosition: Int) //scala
     })
     if (complete) sb.append(" • ")
     sb.append("\t\t(" + startPosition + ")")
-    sb.toString
-  }
-
-  def cRepr: String = {
-    s"${repr}\t[${endPosition}]\t${createdFrom}\t"
-  }
-
-  def completeRepr: String = {
-    val sb = new StringBuilder
-    sb.append(cRepr)
-    sb.append("{")
-    predecessors.foreach(p => sb.append(p.to.cRepr + "; "))
-    sb.append("}")
     sb.toString
   }
 

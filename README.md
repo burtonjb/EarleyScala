@@ -47,7 +47,10 @@ The recognizer then repeatedly executes the 3 following operations:
 * scan: if a is the next symbol in the input stream, for every state in S(k) for the form `X -> A • a B (i)` add `X -> A a • B (i)` to S(k+1)
 * Complete: for every state in S(k) of the form `Y -> A • (i)`, find all states in S(i) of the form `X -> A • Y B (j)` and add `X -> A Y • B (j)` to S(k)
 
-Duplicates aren't added to the state set.          
+Duplicates aren't added to the state set.      
+
+### Handling Ɛ productions 
+TODO!    
 
 ## Earley Parser
 The recognizer doesn't directly give a parse tree, but the sets produced by the recognizer can be used to construct a parser tree.
@@ -93,10 +96,7 @@ A   ->B ->  b
 ### Ambiguous grammars
 This algorithm will work for ambiguous grammars, but will only return one of the possible parse trees from the possible parses.
 
-### Improvements
-
-## Handling Ɛ productions 
-TODO!
+## Improvements
 
 ## Sources
 * https://en.wikipedia.org/wiki/Earley_parser

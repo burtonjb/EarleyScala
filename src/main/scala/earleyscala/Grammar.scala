@@ -2,8 +2,6 @@ package earleyscala
 
 import java.util.UUID
 
-import scala.util.matching.Regex
-
 /*
  * This file has classes that are used to build a grammar.
  */
@@ -16,7 +14,9 @@ final case class NonTerminalSymbol(ruleName: String) extends Symbol {
   override def repr: String = ruleName
 }
 
-case class TerminalSymbol(r: Regex) extends Symbol { //r should be a regex to match a single character
+case class TerminalSymbol(s: String) extends Symbol { //r should be a regex to match a single character
+  private val r = s.r
+
   override def repr: String = s"'${r.pattern.toString}'"
 
   def matches(input: String): Boolean = r.matches(input) //Terminal symbols can be extended to override this behavior if needed
@@ -38,11 +38,13 @@ case class Rule(name: String, symbols: List[Symbol], id: String = UUID.randomUUI
     symbols.foreach(s => sb.append(s.repr + " "))
     sb.toString
   }
+
   /* TODO: add a flag if the rule is a nullable rule.
  * A nullable rule is composed of only nullable symbols
  * A nullable symbol is a symbol that names at least 1 nullable rule.
  */
 }
+
 /*
  * A grammar represents all possible strings in a language.
  * For my parser, a grammar consists of a starting rule and a set of production rules; though formally they are usually a 4 tuple, all information can be derived from my representation.

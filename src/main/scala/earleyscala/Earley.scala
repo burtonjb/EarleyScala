@@ -40,10 +40,8 @@ case class Earley(grammar: Grammar) {
           }
           val reductionPointer = ReductionPointer(i, newState, state)
           val predecessorPointer = PredecessorPointer(i, newState, oldState)
-          newState.predecessors.prepend(reductionPointer)
-          newState.predecessors.prepend(predecessorPointer)
-          state.decendents.prepend(reductionPointer)
-          oldState.decendents.prepend(predecessorPointer)
+          newState.predecessors.append(reductionPointer)
+          newState.predecessors.append(predecessorPointer)
         }
       }
     })
@@ -55,8 +53,7 @@ case class Earley(grammar: Grammar) {
       val newState = EarleyState(state.rule, state.dotPosition + 1, state.startPosition)(i + 1, "scan")
       S(i + 1).append(newState)
       val pointer = PredecessorPointer(i, newState, state)
-      newState.predecessors.prepend(pointer)
-      state.decendents.prepend(pointer)
+      newState.predecessors.append(pointer)
     }
   }
 
