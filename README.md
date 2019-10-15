@@ -53,6 +53,8 @@ Duplicates aren't added to the state set.
 TODO!    
 
 ## Earley Parser
+TODO - rewrite this
+
 The recognizer doesn't directly give a parse tree, but the sets produced by the recognizer can be used to construct a parser tree.
 The technique is to create a top-down parser and walk through the completed Earley states.
 
@@ -96,7 +98,11 @@ A   ->B ->  b
 ### Ambiguous grammars
 This algorithm will work for ambiguous grammars, but will only return one of the possible parse trees from the possible parses.
 
+## Handling scanned/lexed input
+TODO
+
 ## Improvements
+TODO
 
 ## Sources
 * https://en.wikipedia.org/wiki/Earley_parser

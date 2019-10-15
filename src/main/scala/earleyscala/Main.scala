@@ -15,6 +15,8 @@ object Main {
     val chart = earley.buildChart(input)
     val end = chart.getLastStates.head
 
+    println(chart.repr())
+
     TreeUtils.createLeaves(end, input)
     println()
     TreeUtils.createTree(end, input)
