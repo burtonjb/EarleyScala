@@ -51,6 +51,7 @@ Duplicates aren't added to the state set.
 
 ### Handling Ɛ productions 
 TODO!    
+Nullability of productions and symbols
 
 ## Earley Parser
 TODO - rewrite this

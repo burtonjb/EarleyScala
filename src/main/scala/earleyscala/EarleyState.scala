@@ -3,7 +3,7 @@ package earleyscala
 import scala.collection.mutable.ArrayBuffer
 
 /*
-Each state is a tuple (X → α • β, i), consisting of
+Each state (or Earley Item) is a tuple (X → α • β, i), consisting of
 * the production currently being matched (X → α β)
 * our current position in that production (represented by the dot)
 * the position i in the input at which the matching of this production began: the origin position
@@ -15,8 +15,14 @@ case class EarleyState(rule: Rule, dotPosition: Int, startPosition: Int) //scala
 {
   private val _predecessors = new ArrayBuffer[Pointer]()
 
+  def predecessors: ArrayBuffer[Pointer] = _predecessors
+
   def nextSymbol: Option[Symbol] = {
     rule.symbols.lift(dotPosition)
+  }
+
+  def complete: Boolean = {
+    rule.symbols.size == dotPosition
   }
 
   def completeRepr: String = {
@@ -27,8 +33,6 @@ case class EarleyState(rule: Rule, dotPosition: Int, startPosition: Int) //scala
     sb.append("}")
     sb.toString
   }
-
-  def predecessors: ArrayBuffer[Pointer] = _predecessors
 
   def cRepr: String = {
     s"${repr}\t[${endPosition}]\t${createdFrom}\t"
@@ -45,10 +49,6 @@ case class EarleyState(rule: Rule, dotPosition: Int, startPosition: Int) //scala
     if (complete) sb.append(" • ")
     sb.append("\t\t(" + startPosition + ")")
     sb.toString
-  }
-
-  def complete: Boolean = {
-    rule.symbols.size == dotPosition
   }
 
   override def toString: String = {

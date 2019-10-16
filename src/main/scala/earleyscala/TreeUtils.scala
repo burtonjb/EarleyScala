@@ -53,16 +53,8 @@ class DisambiguatingTreeUtils extends FullTreeUtils {
     callback(root, input, depth)
   }
 
-  override def createTree(root: EarleyState, input: String, depth: Int = 0): Unit = {
-    traversal(root, input, printTree)
-  }
-
-  override def createLeaves(root: EarleyState, input: String, depth: Int = 0): Unit = {
-    traversal(root, input, printLeaves)
-  }
-
   protected def disambiguate(children: mutable.Buffer[Pointer]): mutable.Buffer[Pointer] = {
-    //FIXME: pretty sure this will return incorrect results when a scan happens and then something completes.
+    //FIXME: pretty sure this will return incorrect results when a scan happens and then a state completes.
     //Completes have a predecessorPointer and then a reductionPointer. A scan just has a predecessorPointer, so this will take the scan and then the first part of the complete, which will be wrong
     val b = children.groupBy(p => p.label).toList.flatMap(p => {
       p._2.take(2)

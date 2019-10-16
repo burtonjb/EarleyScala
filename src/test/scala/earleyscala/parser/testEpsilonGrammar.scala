@@ -41,7 +41,7 @@ class testEpsilonGrammar extends TestCase {
     val earley = Earley(grammar)
     val chart = earley.buildChart(input)
 
-    println(chart.completeRepr())
+    println(chart.repr())
 
     val end = chart.getLastStates.head
     TreeUtils.createLeaves(end, input)

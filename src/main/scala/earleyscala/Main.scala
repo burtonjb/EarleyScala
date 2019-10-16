@@ -1,6 +1,8 @@
 package earleyscala
 
 object Main {
+
+  //An example parse of a simple calculator, with actions after
   def main(args: Array[String]): Unit = {
     val TreeUtils = new DisambiguatingTreeUtils
     val grammar = Grammar("A",
