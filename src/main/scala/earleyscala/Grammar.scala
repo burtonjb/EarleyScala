@@ -64,6 +64,7 @@ case class Rule(name: String, symbols: List[Symbol], id: String = UUID.randomUUI
 case class Grammar(startRuleName: String, rules: List[Rule]) {
   private val nullableSymbols = new mutable.HashSet[String]()
   buildNullableSymbols()
+  validate
 
   private def buildNullableSymbols(): Unit = {
     //FIXME: This is a O(n^2) way of finding nullable rules. It should probably be converted to a O(n) way of doing this eventually
@@ -84,6 +85,16 @@ case class Grammar(startRuleName: String, rules: List[Rule]) {
     rules.foreach(r => {
       r.symbols.foreach {
         case nt: NonTerminalSymbol => if (nullableSymbols.contains(nt.ruleName)) nt.nullable(true)
+        case t: TerminalSymbol => //pass
+      }
+    })
+  }
+
+  private def validate(): Unit = {
+    val ruleNames = rules.map(r => r.name).toSet
+    rules.foreach(r => {
+      r.symbols.foreach {
+        case nt: NonTerminalSymbol => if (!ruleNames.contains(nt.ruleName)) throw new IllegalStateException(s"rule ${r.name} has NonTerminal symbol ${nt.ruleName} that references a rule that doesn't exist in the grammar")
         case t: TerminalSymbol => //pass
       }
     })

@@ -55,6 +55,7 @@ class testSimpleAmbiguousGrammar extends TestCase {
 
     val earley = Earley(grammar)
     val input = "a+a+a"
+    // There's two ways to parse this input. ((a+a)+a) or (a+(a+a))
     val chart = earley.buildChart(input)
     val end = chart.getLastStates.head
     TreeUtils.createLeaves(end, input)
@@ -124,10 +125,9 @@ class testSimpleAmbiguousGrammarDisambiguated extends TestCase {
     val grammar = Grammar("A",
       List(
         Rule("A", List(NonTerminalSymbol("A"), TerminalSymbol("\\+"), NonTerminalSymbol("A"))),
-        Rule("A", List(NonTerminalSymbol("A"), TerminalSymbol("-"), NonTerminalSymbol("A"))),
         Rule("A", List(TerminalSymbol("a")))
       )
-    ) //A → A + A | A − A | a
+    ) //A → A + A | a
 
     val earley = Earley(grammar)
     val input = "a+a+a"

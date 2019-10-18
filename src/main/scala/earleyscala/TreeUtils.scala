@@ -3,6 +3,9 @@ package earleyscala
 import scala.collection.mutable
 
 trait TreeUtils[T] {
+  /*The traversal is a post-order traversal, so it will output the leaves before outputting the root.
+   * This makes the display upside-down, but its somewhat easy to get used to.
+  */
   def traversal(root: EarleyState, input: String, callback: (EarleyState, String, Int) => T, depth: Int = 0): T
 
   def createTree(root: EarleyState, input: String, depth: Int = 0): T
