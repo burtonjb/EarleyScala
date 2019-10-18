@@ -56,12 +56,8 @@ class testBnfParser extends TestCase {
 
   private def Actions(node: Node, grammar: Grammar): Grammar = {
     //This method will be used to convert the BNF notation to a grammar
-    if (node.value.rule == grammar.rules(0)) {
-      val rule = createRule(node.children(0))
-      Grammar(rule.name, List(rule))
-    } else {
-      Grammar("", List())
-    }
+    //TODO: complete this part
+    Grammar("", List())
   }
 
   def testSimpleGrammar: Unit = {

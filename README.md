@@ -50,64 +50,55 @@ The recognizer then repeatedly executes the 3 following operations:
 Duplicates aren't added to the state set.      
 
 ### Handling Ɛ productions 
-TODO!    
-Nullability of productions and symbols
+Epsilon (Ɛ) productions are rules that can produce an empty string. They are usually represented as `S -> Ɛ`, or in my system as S -> List().
+Handling epsilon productions is tricky as after predicting an epsilon production the epsilon rule/symbol should be immediatly completed.
+
+One way to do this is to scan, and the repeatedly predict/complete until no new productions are created. This doesn't perform well, and is kind of ugly.
+In "Practical Earley Parsing (Aycock & Horspool, 2002)", they proved that after predicting, if the next symbol is nullable, immediately complete that symbol (and repeat until a symbol is not nullable) 
+This is a bit cleaner than the above solution and is fairly easy to implement. 
+ 
+A nullable variable is a value A such that A is either an epsilon production or all rules in A are eventually epsilon productions. Note that terminal symbols are never nullable, and neither are rules that have all derivations with terminal symbols
+
+Then:
+* A -> Ɛ is trivially nullable
+* S -> X is nullable if all symbols of X are nullable. 
+
+Note that A -> a | Ɛ is nullable because there is one derivation of A that is nullable. 
 
 ## Earley Parser
-TODO - rewrite this
-
 The recognizer doesn't directly give a parse tree, but the sets produced by the recognizer can be used to construct a parser tree.
-The technique is to create a top-down parser and walk through the completed Earley states.
+The technique is to create a top-down parser and walk through the completed Earley states, and also the scanned terminals
 
 You can tell if there can be a successful parse if there is a rule in the final completed set states that has a start position of rule and the rule matches the initial rule.
 Then because there is a complete state in the final state set, there must be completed states in earlier set states, but the parser must find out where they exist.
 
-For example, if you have 6 set states (indexing from 0) and you have: 
-`A -> A B C • (5)` as the final state.
-A, B must be completed in earlier set states, and C must be completed in this set state.
-Using the start position of C, you can search the corresponding set state for the completion of B, and then repeat for A. (This is like a breadth first search)
-This will give the first level of the parse tree. You would then repeat this process for each NonTerminal symbol child of the current node.
-If its a terminal symbol, then just take the character at the current input position
+The technique I used to construct the parse tree is from "SPPF-Style Parsing From Earley Recognisers (Elizabeth Scott, 2008)" using the technique described in section 4.
+Its actually pretty simple - 
+* For a scan add a predecessor pointer from the post scan point to the prescan point (there is an error in the paper where Scott incorrectly has the from/to reversed)
+* For a complete add a reduction pointer from the new states generated from complete to the completed state and if the symbol is not and epsilon a predecessor pointer from each old state to the new state 
 
-For example (using lower case characters to represent terminal character):
-<pre>
-A->BAC | a
-B->b
-C->c
-</pre>
+Note that predicting a nullable symbol will have the nullable symbol be immediately completed
 
-Below is an example of constructing the parse tree, with the above grammar, and with the input `bbacc`. Values in parens are the end of the matches for the completed states
-<pre>
-    A->BAC•(5)
-B(?)   A(?)     C(5)
-C is just a terminal rule, so just subtract 1 from the search index 
-
-    A->BAC•(5)
-B(1)    A(4)    C(5)
-A is a nonterminal rule and starts at 1, so B must be in state 1
-        
-A(4) then needs to be determined, repeating the above process, except with A(3) as the root node.
-B(1) and C(5) are terminal rules, so they can just use the symbol. The fully constructed parse tree would look like:
-
-A   ->B ->  b    
-    ->A ->B ->b
-        ->A ->a
-        ->C ->c
-    ->C ->  c 
-</pre>
+The parse algorithm will then just walk down the tree of pointers. 
 
 ### Ambiguous grammars
-This algorithm will work for ambiguous grammars, but will only return one of the possible parse trees from the possible parses.
+This algorithm will be able to handle ambiguous grammars and can return the parse forest. 
 
-## Handling scanned/lexed input
-TODO
+There is another algorithm to disambiguate the parse forest, returning a single parse tree. To do this the algorithm picks one of the reduction/predecessor or reduction pairs. Though I wouldn't really trust this algorithm. It seemed to work for my test cases, but I never tried to prove its correctness.
 
 ## Improvements
-TODO
+### Handling scanned/lexed/tokenized input
+I believe that the input text could be pre-processed by a tokenizer, and then the TerminalSymbol class could be subclassed to match these tokens.
+The input text would then be converted to a list of input tokens. Doing this should simplify the grammar and make the algorithm perform better, since the worst case runtime is O(n^3), where n is the input length. 
+This wouldn't improve the asymptotic complexity though
+
+### Shared packed parse forest construction
+Elizabeth Scott in section 5 describes how to convert the parse tree into a binarized parse tree. This would cap the parse runtime from unbounded runtime to O(n^3)
+
+More details about the SPPF can be found here: http://www.bramvandersanden.com/post/2014/06/shared-packed-parse-forest/ 
 
 ## Sources
 * https://en.wikipedia.org/wiki/Earley_parser
 * http://loup-vaillant.fr/tutorials/earley-parsing/ 
-* https://dickgrune.com/Books/PTAPG_1st_Edition/
 * https://courses.engr.illinois.edu/cs421/sp2012/project/PracticalEarleyParsing.pdf
 * https://www.sciencedirect.com/science/article/pii/S1571066108001497?via%3Dihub

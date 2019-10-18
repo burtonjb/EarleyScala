@@ -57,10 +57,10 @@ class DisambiguatingTreeUtils extends FullTreeUtils {
   }
 
   protected def disambiguate(children: mutable.Buffer[Pointer]): mutable.Buffer[Pointer] = {
-    //FIXME: pretty sure this will return incorrect results when a scan happens and then a state completes.
-    //Completes have a predecessorPointer and then a reductionPointer. A scan just has a predecessorPointer, so this will take the scan and then the first part of the complete, which will be wrong
+    //FIXME: this hasn't been fully tested
     val b = children.groupBy(p => p.label).toList.flatMap(p => {
-      p._2.take(2)
+      if (p._2(0).isInstanceOf[ReductionPointer] && p._2(1).isInstanceOf[ReductionPointer]) p._2.take(1)
+      else p._2.take(2)
     })
     b.toBuffer
   }
