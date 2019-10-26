@@ -79,13 +79,13 @@ class testBnfParser extends TestCase {
     }
 
     def parseList(node: Node): List[Symbol] = {
-      if (node.value.rule == grammar.rules(8)) List(parseTerm(node.children(0)))
-      else parseList(node.children(0)).appended(parseTerm(node.children(2)))
+      if (node.value.rule == grammar.rules(8)) parseTerm(node.children(0))
+      else parseList(node.children(0)).concat(parseTerm(node.children(2)))
     }
 
-    def parseTerm(node: Node): Symbol = {
-      if (node.value.rule == grammar.rules(10)) TerminalSymbol(parseString(node.children(0).children(1)))
-      else NonTerminalSymbol(parseString(node.children(1)))
+    def parseTerm(node: Node): List[Symbol] = {
+      if (node.value.rule == grammar.rules(10)) parseString(node.children(0).children(1)).toList.map(c => TerminalSymbol(c.toString))
+      else List(NonTerminalSymbol(parseString(node.children(1))))
     }
 
     val rules = parseRules(root)
@@ -151,10 +151,18 @@ class testBnfParser extends TestCase {
     println(out.repr)
     /*
     start: S
-    S -> A 'bc'
+    S -> A 'b' 'c'
     S -> '0'
     A -> 'a'
     */
+
+    val earley2 = Earley(out)
+    val chart2 = earley2.buildChart("abc")
+    val chart3 = earley2.buildChart("0")
+
+    TreeUtils.createLeaves(chart2.getLastStates.head, "abc")
+    println()
+    TreeUtils.createLeaves(chart3.getLastStates.head, "0")
   }
 
   def testGrammar: Unit = {
