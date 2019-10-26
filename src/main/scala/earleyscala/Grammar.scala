@@ -52,7 +52,7 @@ case class TerminalSymbol(s: String) extends Symbol { //s should be a regex to m
 }
 
 
-case class Rule(name: String, symbols: List[Symbol], id: String = UUID.randomUUID().toString) { //duplicate rules are technically allowed, so id is to make the rules unique
+case class Rule(name: String, symbols: Seq[Symbol], id: String = UUID.randomUUID().toString) { //duplicate rules are technically allowed, so id is to make the rules unique
   def repr: String = {
     val sb = new StringBuilder()
     sb.append(name + " -> ")
@@ -61,7 +61,7 @@ case class Rule(name: String, symbols: List[Symbol], id: String = UUID.randomUUI
   }
 }
 
-case class Grammar(startRuleName: String, rules: List[Rule]) {
+case class Grammar(startRuleName: String, rules: Seq[Rule]) {
   private val nullableSymbols = new mutable.HashSet[String]()
   buildNullableSymbols()
   validate
@@ -107,7 +107,7 @@ case class Grammar(startRuleName: String, rules: List[Rule]) {
     sb.toString
   }
 
-  def getRulesByName(name: String): List[Rule] = {
+  def getRulesByName(name: String): Seq[Rule] = {
     //FIXME: construct a multimap of name->rule so that getRulesByName is O(1)
     rules.filter(r => r.name == name)
   }

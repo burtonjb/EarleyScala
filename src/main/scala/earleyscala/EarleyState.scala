@@ -59,9 +59,9 @@ case class EarleyState(rule: Rule, dotPosition: Int, startPosition: Int) //scala
 //eventually I need to convert these pointers into a SharedPackedParseForest (SPPF), to cap the time and space complexity to O(n^3)
 //See SPPF-Style Parsing From Earley Recognisers by Elizabeth Scott
 sealed trait Pointer {
-  val label: Int
-  val from: EarleyState
-  val to: EarleyState
+  def label: Int
+  def from: EarleyState
+  def to: EarleyState
 }
 
 final case class PredecessorPointer(label: Int, from: EarleyState, to: EarleyState) extends Pointer
