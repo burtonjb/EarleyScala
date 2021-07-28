@@ -1,7 +1,5 @@
 package earleyscala
 
-;
-
 object Main {
 
   //An example parse of a simple calculator, with actions after
