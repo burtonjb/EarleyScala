@@ -55,6 +55,10 @@ class EarleyChart(val grammar: Grammar, val input: String) {
     repr(earleyState => earleyState.repr + '\n')
   }
 
+  def completeRepr(): String = {
+    repr(earleyState => earleyState.completeRepr + '\n')
+  }
+
   // Util function
   def repr(f: EarleyState => String): String = {
     val s = new StringBuilder()
@@ -66,9 +70,5 @@ class EarleyChart(val grammar: Grammar, val input: String) {
       })
     })
     s.toString()
-  }
-
-  def completeRepr(): String = {
-    repr(earleyState => earleyState.completeRepr + '\n')
   }
 }

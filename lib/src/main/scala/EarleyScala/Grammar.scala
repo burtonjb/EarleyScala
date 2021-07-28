@@ -1,7 +1,6 @@
 package earleyscala
 
 import java.util.UUID
-
 import scala.collection.mutable
 
 /*
@@ -28,6 +27,7 @@ import scala.collection.mutable
 
 sealed trait Symbol {
   def repr: String //Used to pretty print the symbols. toString will have the class name too
+
   def nullable: Boolean
 }
 
@@ -66,6 +66,18 @@ case class Grammar(startRuleName: String, rules: Seq[Rule]) {
   buildNullableSymbols()
   validate
 
+  def repr: String = {
+    val sb = new StringBuilder()
+    sb.append(s"start: $startRuleName\n")
+    rules.foreach(r => sb.append(r.repr + '\n'))
+    sb.toString
+  }
+
+  def getRulesByName(name: String): Seq[Rule] = {
+    //FIXME: construct a multimap of name->rule so that getRulesByName is O(1)
+    rules.filter(r => r.name == name)
+  }
+
   private def buildNullableSymbols(): Unit = {
     //FIXME: This is a O(n^2) way of finding nullable rules. It should probably be converted to a O(n) way of doing this eventually
     var s = nullableSymbols.size - 1
@@ -98,17 +110,5 @@ case class Grammar(startRuleName: String, rules: Seq[Rule]) {
         case t: TerminalSymbol => //pass
       }
     })
-  }
-
-  def repr: String = {
-    val sb = new StringBuilder()
-    sb.append(s"start: $startRuleName\n")
-    rules.foreach(r => sb.append(r.repr + '\n'))
-    sb.toString
-  }
-
-  def getRulesByName(name: String): Seq[Rule] = {
-    //FIXME: construct a multimap of name->rule so that getRulesByName is O(1)
-    rules.filter(r => r.name == name)
   }
 }

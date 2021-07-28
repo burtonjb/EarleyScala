@@ -1,5 +1,7 @@
 package earleyscala
 
+;
+
 object Main {
 
   //An example parse of a simple calculator, with actions after
@@ -40,7 +42,7 @@ object Main {
           A -> '\d'
           +
             1
-          A -> '\d' 
+          A -> '\d'
         A -> A '\+' A
       A -> A '\+' A
     A -> A '\+' A

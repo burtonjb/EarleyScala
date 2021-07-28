@@ -15,14 +15,8 @@ case class EarleyState(rule: Rule, dotPosition: Int, startPosition: Int) //scala
 {
   private val _predecessors = new ArrayBuffer[Pointer]()
 
-  def predecessors: ArrayBuffer[Pointer] = _predecessors
-
   def nextSymbol: Option[Symbol] = {
     rule.symbols.lift(dotPosition)
-  }
-
-  def complete: Boolean = {
-    rule.symbols.size == dotPosition
   }
 
   def completeRepr: String = {
@@ -33,6 +27,8 @@ case class EarleyState(rule: Rule, dotPosition: Int, startPosition: Int) //scala
     sb.append("}")
     sb.toString
   }
+
+  def predecessors: ArrayBuffer[Pointer] = _predecessors
 
   def cRepr: String = {
     s"${repr}\t[${endPosition}]\t${createdFrom}\t"
@@ -51,6 +47,10 @@ case class EarleyState(rule: Rule, dotPosition: Int, startPosition: Int) //scala
     sb.toString
   }
 
+  def complete: Boolean = {
+    rule.symbols.size == dotPosition
+  }
+
   override def toString: String = {
     repr
   }
@@ -60,7 +60,9 @@ case class EarleyState(rule: Rule, dotPosition: Int, startPosition: Int) //scala
 //See SPPF-Style Parsing From Earley Recognisers by Elizabeth Scott
 sealed trait Pointer {
   def label: Int
+
   def from: EarleyState
+
   def to: EarleyState
 }
 
