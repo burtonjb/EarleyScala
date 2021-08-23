@@ -15,11 +15,11 @@ trait TreeUtils[T] {
 
 class FullTreeUtils extends TreeUtils[Unit] {
   override def traversal(root: EarleyState, input: String, callback: (EarleyState, String, Int) => Unit, depth: Int = 0): Unit = {
-    root.predecessors.reverse.foreach(p => {
+    callback(root, input, depth)
+    root.predecessors.foreach(p => {
       if (root.complete) traversal(p.to, input, callback, depth + 1)
       else traversal(p.to, input, callback, depth)
     })
-    callback(root, input, depth)
   }
 
   override def createTree(root: EarleyState, input: String, depth: Int): Unit = {

@@ -1,6 +1,5 @@
-package earleyscala.parser
+package earleyscala
 
-import earleyscala._
 import junit.framework.TestCase
 
 class testEpsilonGrammar extends TestCase {
