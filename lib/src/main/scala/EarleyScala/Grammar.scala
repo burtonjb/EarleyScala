@@ -26,8 +26,6 @@ import scala.collection.mutable
  */
 
 sealed trait Symbol {
-  def repr: String //Used to pretty print the symbols. toString will have the class name too
-
   def nullable: Boolean
 }
 
@@ -38,13 +36,13 @@ final case class NonTerminalSymbol(ruleName: String) extends Symbol {
 
   def nullable(value: Boolean): Unit = this._nullable = value
 
-  override def repr: String = ruleName
+  override def toString: String = ruleName
 }
 
 case class TerminalSymbol(s: String) extends Symbol { //s should be a regex to match a single character
   private val r = s.r
 
-  override def repr: String = s"'${r.pattern.toString}'"
+  override def toString: String = s"'${r.pattern.toString}'"
 
   override def nullable: Boolean = false //Terminal symbols are never nullable
 
@@ -53,25 +51,15 @@ case class TerminalSymbol(s: String) extends Symbol { //s should be a regex to m
 
 
 case class Rule(name: String, symbols: Seq[Symbol], id: String = UUID.randomUUID().toString) { //duplicate rules are technically allowed, so id is to make the rules unique
-  def repr: String = {
-    val sb = new StringBuilder()
-    sb.append(name + " -> ")
-    symbols.foreach(s => sb.append(s.repr + " "))
-    sb.toString
-  }
+  override def toString: String = s"$name -> ${symbols.fold("")((a, s) => a.toString + s.toString + " ")}"
 }
 
 case class Grammar(startRuleName: String, rules: Seq[Rule]) {
   private val nullableSymbols = new mutable.HashSet[String]()
+  validate()
   buildNullableSymbols()
-  validate
 
-  def repr: String = {
-    val sb = new StringBuilder()
-    sb.append(s"start: $startRuleName\n")
-    rules.foreach(r => sb.append(r.repr + '\n'))
-    sb.toString
-  }
+  override def toString: String = s"start: ${startRuleName}\n${rules.fold("")((a, r) => a.toString + r.toString + "\n")}"
 
   def getRulesByName(name: String): Seq[Rule] = {
     //FIXME: construct a multimap of name->rule so that getRulesByName is O(1)

@@ -10,6 +10,9 @@ package earleyscala
  *
  * Handling epsilon productions is done by running complete after predict if the symbol(s) after the dot are nullable.
  * If (S → • N ... , i) is the predicted state, and N is nullable, complete the state with (S → N • ... , i). Then repeat the check/complete for the next symbol in S
+ * 
+ * This is somewhat close to Earley's original implementation described in his 1968 paper, with the nullable rule changes specified
+ * by Aycock and Horspool in their 2002 paper. 
  */
 case class Earley(grammar: Grammar) {
   def buildChart(input: String): EarleyChart = {
@@ -24,10 +27,8 @@ case class Earley(grammar: Grammar) {
         val state = S(i)(j)
         val symbol = state.nextSymbol
         symbol match {
-          case Some(t:
-            TerminalSymbol) => scan(S, i, j, t, input)
-          case Some(nt:
-            NonTerminalSymbol) => predict(S, i, nt)
+          case Some(t: TerminalSymbol) => scan(S, i, j, t, input)
+          case Some(nt: NonTerminalSymbol) => predict(S, i, nt)
           case None => complete(S, i, j)
           case _ => throw new IllegalStateException("Unable to recognize pattern")
         }

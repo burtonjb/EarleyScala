@@ -2,11 +2,16 @@ package earleyscala
 
 import junit.framework.TestCase
 import org.junit.Assert
+import org.junit.FixMethodOrder
+import org.junit.runners.MethodSorters
+import org.junit.Test
 
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 class testArithmeticGrammar extends TestCase {
   val TreeUtils = new FullTreeUtils
 
-  def testGrammar(): Unit = {
+  @Test
+  def test_1_BasicAdditionOnlyGrammar(): Unit = {
     //grammar from - https://en.wikipedia.org/wiki/Ambiguous_grammar#Addition_and_subtraction
     val grammar = Grammar("A",
       List(
@@ -32,7 +37,8 @@ class testArithmeticGrammar extends TestCase {
     */
   }
 
-  def testBasicArithmeticGrammar: Unit = {
+  @Test
+  def test_2_BasicArithmeticGrammar: Unit = {
     //This grammar was taken off the wikipedia - https://en.wikipedia.org/wiki/Earley_parser#Example
     val grammar = Grammar("P",
       List(
@@ -72,8 +78,8 @@ class testArithmeticGrammar extends TestCase {
     */
   }
 
-
-  def testArithmeticGrammar_WithBraces: Unit = {
+  @Test
+  def test_3_ArithmeticGrammar_WithBraces: Unit = {
     // This grammar was taken from here: http://loup-vaillant.fr/tutorials/earley-parsing/ which is an excellent resource on how to write an earley parser
     val grammar = Grammar("sum",
       List(
@@ -222,7 +228,8 @@ class testArithmeticGrammar extends TestCase {
     */*/
   }
 
-  def testArithmeticGrammar_WithBraces_AndActions: Unit = {
+  @Test
+  def test_4_ArithmeticGrammar_WithBraces_AndActions: Unit = {
     // This is using Lou's grammar, but there are actions defined to convert the parse tree into a number
     val grammar = Grammar("sum",
       List(

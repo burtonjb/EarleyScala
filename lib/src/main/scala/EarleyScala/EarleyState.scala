@@ -31,28 +31,24 @@ case class EarleyState(rule: Rule, dotPosition: Int, startPosition: Int) //scala
   def predecessors: ArrayBuffer[Pointer] = _predecessors
 
   def cRepr: String = {
-    s"${repr}\t[${endPosition}]\t${createdFrom}\t"
+    s"${toString}\t[${endPosition}]\t${createdFrom}\t"
   }
 
-  def repr: String = {
+  override def toString: String = {
     val sb = new StringBuilder
     sb.append(rule.name + " -> ")
     rule.symbols.zipWithIndex.foreach(p => {
       val (symbol, index) = p
       if (index == dotPosition) sb.append(" • ")
-      sb.append(" " + symbol.repr + " ")
+      sb.append(" " + symbol.toString + " ")
     })
-    if (complete) sb.append(" • ")
+    if (isComplete) sb.append(" • ")
     sb.append("\t\t(" + startPosition + ")")
     sb.toString
   }
 
-  def complete: Boolean = {
+  def isComplete: Boolean = {
     rule.symbols.size == dotPosition
-  }
-
-  override def toString: String = {
-    repr
   }
 }
 

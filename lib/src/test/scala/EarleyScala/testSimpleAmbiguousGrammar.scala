@@ -1,11 +1,16 @@
 package earleyscala
 
 import junit.framework.TestCase
+import org.junit.FixMethodOrder
+import org.junit.runners.MethodSorters
+import org.junit.Test
 
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 class testSimpleAmbiguousGrammar extends TestCase {
   val TreeUtils = new FullTreeUtils
 
-  def testEScottExample2(): Unit = {
+  @Test
+  def test_1_EScottExample2(): Unit = {
     //grammar from here: https://www.sciencedirect.com/science/article/pii/S1571066108001497 - Paper by Elizabeth Scott; the example 2 grammar
     val grammar = Grammar("S",
       List(
@@ -43,7 +48,8 @@ class testSimpleAmbiguousGrammar extends TestCase {
     */
   }
 
-  def testGrammar(): Unit = {
+  @Test
+  def test_2_Grammar(): Unit = {
     //grammar from - https://en.wikipedia.org/wiki/Ambiguous_grammar#Addition_and_subtraction
     val grammar = Grammar("A",
       List(
@@ -87,11 +93,12 @@ class testSimpleAmbiguousGrammar extends TestCase {
   }
 }
 
-
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 class testSimpleAmbiguousGrammarDisambiguated extends TestCase {
   val TreeUtils = new DisambiguatingTreeUtils
 
-  def testEScottExample2(): Unit = {
+  @Test
+  def test_1_EScottExample2(): Unit = {
     //grammar from here: https://www.sciencedirect.com/science/article/pii/S1571066108001497 - Paper by Elizabeth Scott; the example 2 grammar
     val grammar = Grammar("S",
       List(
@@ -119,7 +126,8 @@ class testSimpleAmbiguousGrammarDisambiguated extends TestCase {
     */
   }
 
-  def testGrammar(): Unit = {
+  @Test
+  def test_2_Grammar(): Unit = {
     //grammar from: https://en.wikipedia.org/wiki/Ambiguous_grammar#Addition_and_subtraction
     val grammar = Grammar("A",
       List(

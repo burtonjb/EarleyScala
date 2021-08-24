@@ -1,7 +1,11 @@
 package earleyscala
 
 import junit.framework.TestCase
+import org.junit.FixMethodOrder
+import org.junit.runners.MethodSorters
+import org.junit.Test
 
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 class testBnfParser extends TestCase {
   val TreeUtils = new DisambiguatingTreeUtils
 
@@ -92,7 +96,8 @@ class testBnfParser extends TestCase {
 
   }
 
-  def testSimpleTerminalGrammar: Unit = {
+  @Test
+  def test_1_SimpleTerminalGrammar: Unit = {
     val earley = Earley(grammar)
     val input = " <rule> ::= 'rule'\n"
     val chart = earley.buildChart(input)
@@ -100,14 +105,15 @@ class testBnfParser extends TestCase {
 
     val parseTree = new ParseTree().traversal(end, input)
     val out = Actions(parseTree, grammar)
-    println(out.repr)
+    println(out.toString)
     /*
     start: rule
     rule -> 'rule'
     */
   }
 
-  def testSimpleNonTerminalGrammar: Unit = {
+  @Test
+  def test_2_SimpleNonTerminalGrammar: Unit = {
     val earley = Earley(grammar)
     val input = " <rule> ::= <rule>\n"
     val chart = earley.buildChart(input)
@@ -115,14 +121,15 @@ class testBnfParser extends TestCase {
 
     val parseTree = new ParseTree().traversal(end, input)
     val out = Actions(parseTree, grammar)
-    println(out.repr)
+    println(out.toString)
     /*
     start: rule
     rule -> rule
     */
   }
 
-  def testOrRuleGrammar: Unit = {
+  @Test
+  def test_3_OrRuleGrammar: Unit = {
     val earley = Earley(grammar)
     val input = " <rule> ::= <rule> | 'rule'\n"
     val chart = earley.buildChart(input)
@@ -130,7 +137,7 @@ class testBnfParser extends TestCase {
 
     val parseTree = new ParseTree().traversal(end, input)
     val out = Actions(parseTree, grammar)
-    println(out.repr)
+    println(out.toString)
     /*
     start: rule
     rule -> rule
@@ -138,7 +145,8 @@ class testBnfParser extends TestCase {
     */
   }
 
-  def testMultiRuleGrammar: Unit = {
+  @Test
+  def test_4_MultiRuleGrammar: Unit = {
     val earley = Earley(grammar)
     val input = " <S> ::= <A> 'bc' | '0'\n" +
       " <A> ::= 'a'\n"
@@ -147,7 +155,7 @@ class testBnfParser extends TestCase {
 
     val parseTree = new ParseTree().traversal(end, input)
     val out = Actions(parseTree, grammar)
-    println(out.repr)
+    println(out.toString)
     /*
     start: S
     S -> A 'b' 'c'
@@ -164,7 +172,8 @@ class testBnfParser extends TestCase {
     TreeUtils.createLeaves(chart3.getLastStates.head, "0")
   }
 
-  def testGrammar: Unit = {
+  @Test
+  def test_5_CompleteBnfGrammar: Unit = {
     val earley = Earley(grammar)
     val input = //I was running into issues using the scala multiline strings, but this seemed to work, so this is how it is
       " <syntax> ::= <rule> | <rule> <syntax>\n" +
@@ -174,7 +183,7 @@ class testBnfParser extends TestCase {
         " <line-end> ::= <EOL>\n" +
         " <list> ::= <term> | <term> <whitespace> <list>\n" +
         " <term> ::= <literal> | '<' <rule-name> '>'\n" +
-        " <literal> ::= 'literal-def'\n" +
+        " <literal> ::= 'literal-def'\n" + // why is this like this?
         " <character> ::= <letter> | <digit> | <symbol>\n" +
         " <letter> ::= 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G' | 'H' | 'I' | 'J' | 'K' | 'L' | 'M' | 'N' | 'O' | 'P' | 'Q' | 'R' | 'S' | 'T' | 'U' | 'V' | 'W' | 'X' | 'Y' | 'Z' | 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' | 'i' | 'j' | 'k' | 'l' | 'm' | 'n' | 'o' | 'p' | 'q' | 'r' | 's' | 't' | 'u' | 'v' | 'w' | 'x' | 'y' | 'z'\n" +
         " <digit> ::= '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'\n" +
@@ -189,7 +198,7 @@ class testBnfParser extends TestCase {
 
     val parseTree = new ParseTree().traversal(end, input)
     val out = Actions(parseTree, grammar)
-    println(out.repr)
+    println(out.toString)
     /*
     start: syntax
     syntax -> rule
@@ -284,7 +293,7 @@ class testBnfParser extends TestCase {
     rule-char -> '-'
     EOL -> '
     '
-  */
+    */
   }
 
 }

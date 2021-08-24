@@ -15,11 +15,11 @@ trait TreeUtils[T] {
 
 class FullTreeUtils extends TreeUtils[Unit] {
   override def traversal(root: EarleyState, input: String, callback: (EarleyState, String, Int) => Unit, depth: Int = 0): Unit = {
-    callback(root, input, depth)
-    root.predecessors.foreach(p => {
-      if (root.complete) traversal(p.to, input, callback, depth + 1)
+    root.predecessors.reverse.foreach(p => {
+      if (root.isComplete) traversal(p.to, input, callback, depth + 1)
       else traversal(p.to, input, callback, depth)
     })
+    callback(root, input, depth)
   }
 
   override def createTree(root: EarleyState, input: String, depth: Int): Unit = {
@@ -31,15 +31,15 @@ class FullTreeUtils extends TreeUtils[Unit] {
   }
 
   protected def printTree(root: EarleyState, input: String, depth: Int): Unit = {
-    if (root.complete) {
-      println("\t" * depth + root.rule.repr)
+    if (root.isComplete) {
+      println("\t" * depth + root.rule.toString)
     } else if (root.rule.symbols(root.dotPosition).isInstanceOf[TerminalSymbol]) {
       println("\t" * depth + input.charAt(root.endPosition))
     }
   }
 
   protected def printLeaves(root: EarleyState, input: String, depth: Int): Unit = {
-    if (root.complete) {}
+    if (root.isComplete) {}
     else if (root.rule.symbols(root.dotPosition).isInstanceOf[TerminalSymbol]) {
       print(input.charAt(root.endPosition))
     }
@@ -50,7 +50,7 @@ class DisambiguatingTreeUtils extends FullTreeUtils {
   override def traversal(root: EarleyState, input: String, callback: (EarleyState, String, Int) => Unit, depth: Int = 0): Unit = {
     val children = root.predecessors.reverse
     disambiguate(children).foreach(p => {
-      if (root.complete) traversal(p.to, input, callback, depth + 1)
+      if (root.isComplete) traversal(p.to, input, callback, depth + 1)
       else traversal(p.to, input, callback, depth)
     })
     callback(root, input, depth)

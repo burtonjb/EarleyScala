@@ -1,10 +1,16 @@
 package earleyscala
 
 import junit.framework.TestCase
+import org.junit.FixMethodOrder
+import org.junit.runners.MethodSorters
+import org.junit.Test
 
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 class testEpsilonGrammar extends TestCase {
   val TreeUtils = new DisambiguatingTreeUtils
-  def testEpsilonGrammar: Unit = {
+
+  @Test
+  def test_1_EpsilonGrammar: Unit = {
     val grammar = Grammar("A",
       List(
         Rule("A", List()),
@@ -36,7 +42,8 @@ class testEpsilonGrammar extends TestCase {
     */
   }
 
-  def testAycockHorspoolExample: Unit = {
+  @Test
+  def test_2_AycockHorspoolExample: Unit = {
     //This test case was taken from Practical Earley Parsing (John Aycock, R. Nigel Horspool) [2002]
     val grammar = Grammar("Start",
       List(

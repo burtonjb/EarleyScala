@@ -13,18 +13,18 @@ class ParseTree {
     val children = root.predecessors.reverse
 
     var repr = ""
-    if (root.complete) {
-      repr = root.rule.repr
+    if (root.isComplete) {
+      repr = root.rule.toString
     } else if (root.rule.symbols(root.dotPosition).isInstanceOf[TerminalSymbol]) {
       repr = input.charAt(root.endPosition).toString
     }
     val node = Node(repr, root, new ArrayBuffer[Node]())
     children.foreach(p => {
-      if (root.complete) traversal(p.to, input, Option(node))
+      if (root.isComplete) traversal(p.to, input, Option(node))
       else traversal(p.to, input, parent)
     })
 
-    if (root.complete || root.rule.symbols(root.dotPosition).isInstanceOf[TerminalSymbol]) {
+    if (root.isComplete || root.rule.symbols(root.dotPosition).isInstanceOf[TerminalSymbol]) {
       if (parent.isEmpty) return node
       else parent.get.children.append(node)
     }
