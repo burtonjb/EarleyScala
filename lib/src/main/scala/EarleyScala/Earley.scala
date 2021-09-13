@@ -1,18 +1,20 @@
 package earleyscala
 
 /*
-* The state set at input position k is called S(k). The parser is seeded with S(0) consisting of only the top-level rule.
-* The parser then repeatedly executes three operations: prediction, scanning, and completion.
-*
-* Prediction: For every state in S(k) of the form (X → α • Y β, j) (where j is the origin position as above), add (Y → • γ, k) to S(k) for every production in the grammar with Y on the left-hand side (Y → γ).
-* Scanning: If a is the next symbol in the input stream, for every state in S(k) of the form (X → α • a β, j), add (X → α a • β, j) to S(k+1).
-* Completion: For every state in S(k) of the form (Y → γ •, j), find all states in S(j) of the form (X → α • Y β, i) and add (X → α Y • β, i) to S(k).
-*
-* Handling epsilon productions is done by running complete after predict if the symbol(s) after the dot are nullable.
-* If (S → • N ... , i) is the predicted state, and N is nullable, complete the state with (S → N • ... , i). Then repeat the check/complete for the next symbol in S
+ * The state set at input position k is called S(k). The parser is seeded with S(0) consisting of only the top-level rule.
+ * The parser then repeatedly executes three operations: prediction, scanning, and completion.
+ *
+ * Prediction: For every state in S(k) of the form (X → α • Y β, j) (where j is the origin position as above), add (Y → • γ, k) to S(k) for every production in the grammar with Y on the left-hand side (Y → γ).
+ * Scanning: If a is the next symbol in the input stream, for every state in S(k) of the form (X → α • a β, j), add (X → α a • β, j) to S(k+1).
+ * Completion: For every state in S(k) of the form (Y → γ •, j), find all states in S(j) of the form (X → α • Y β, i) and add (X → α Y • β, i) to S(k).
+ *
+ * Handling epsilon productions is done by running complete after predict if the symbol(s) after the dot are nullable.
+ * If (S → • N ... , i) is the predicted state, and N is nullable, complete the state with (S → N • ... , i). Then repeat the check/complete for the next symbol in S
+ * 
+ * This is somewhat close to Earley's original implementation described in his 1968 paper, with the nullable rule changes specified
+ * by Aycock and Horspool in their 2002 paper. 
  */
 case class Earley(grammar: Grammar) {
-
   def buildChart(input: String): EarleyChart = {
     // build the initial chart
     val S = new EarleyChart(grammar, input)
@@ -57,27 +59,6 @@ case class Earley(grammar: Grammar) {
     })
   }
 
-  private def complete(S: EarleyChart, i: Int, j: Int): Unit = {
-    val completedState = S(i)(j)
-    S(completedState.startPosition).foreach(oldState => {
-      val symbol = oldState.nextSymbol
-      if (symbol.isDefined && symbol.get.isInstanceOf[NonTerminalSymbol]) {
-        if (symbol.get.asInstanceOf[NonTerminalSymbol].ruleName == completedState.rule.name) {
-          var newState = EarleyState(oldState.rule, oldState.dotPosition + 1, oldState.startPosition)(i, "complete")
-          if (!S(i).contains(newState)) {
-            S(i).append(newState)
-          } else {
-            newState = S(i).findLast(e => e == newState).get
-          }
-          val reductionPointer = ReductionPointer(i, newState, completedState)
-          val predecessorPointer = PredecessorPointer(i, newState, oldState)
-          newState.predecessors.append(reductionPointer)
-          newState.predecessors.append(predecessorPointer)
-        }
-      }
-    })
-  }
-
   private def completePrediction(rule: Rule, S: EarleyChart, i: Int, predictedState: EarleyState): Unit = {
     var oldState = predictedState
     rule.symbols.zipWithIndex.foreach(pair => {
@@ -95,6 +76,27 @@ case class Earley(grammar: Grammar) {
           S(i).append(newState)
         }
         oldState = newState
+      }
+    })
+  }
+
+  private def complete(S: EarleyChart, i: Int, j: Int): Unit = {
+    val completedState = S(i)(j)
+    S(completedState.startPosition).foreach(oldState => {
+      val symbol = oldState.nextSymbol
+      if (symbol.isDefined && symbol.get.isInstanceOf[NonTerminalSymbol]) {
+        if (symbol.get.asInstanceOf[NonTerminalSymbol].ruleName == completedState.rule.name) {
+          var newState = EarleyState(oldState.rule, oldState.dotPosition + 1, oldState.startPosition)(i, "complete")
+          if (!S(i).contains(newState)) {
+            S(i).append(newState)
+          } else {
+            newState = S(i).findLast(e => e == newState).get
+          }
+          val reductionPointer = ReductionPointer(i, newState, completedState)
+          val predecessorPointer = PredecessorPointer(i, newState, oldState)
+          newState.predecessors.append(reductionPointer)
+          newState.predecessors.append(predecessorPointer)
+        }
       }
     })
   }

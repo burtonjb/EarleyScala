@@ -1,13 +1,17 @@
-package earleyscala.parser
+package earleyscala
 
-import earleyscala._
 import junit.framework.TestCase
 import org.junit.Assert
+import org.junit.FixMethodOrder
+import org.junit.runners.MethodSorters
+import org.junit.Test
 
+@FixMethodOrder(MethodSorters.NAME_ASCENDING) // don't do this in production, but since these test cases are for demo purposes and ordered from not complex to complex, this is fine.
 class testBasicGrammars extends TestCase {
   val TreeUtil = new DisambiguatingTreeUtils
 
-  def testSimplistGrammar: Unit = {
+  @Test
+  def test_1_SimplistGrammar: Unit = {
     /*
     This is a simple grammar which accepts 'a' and rejects anything else
      */
@@ -45,7 +49,8 @@ class testBasicGrammars extends TestCase {
     Assert.assertTrue(earley.buildChart(rejectedInput).getLastStates.isEmpty)
   }
 
-  def testAllTerminals() = {
+  @Test
+  def test_2_AllTerminals() = {
     /*
     This grammar accepts the string 'abc' and doesn't accept anything else.
      */
@@ -87,7 +92,8 @@ class testBasicGrammars extends TestCase {
     */
   }
 
-  def testPalindrome: Unit = {
+  @Test
+  def test_3_Palindrome: Unit = {
     /*
     This grammar accepts a palindrome of an odd number of characters.
     The grammar could be modified to accept a palindrome of an even number of characters if a rule S->() is added

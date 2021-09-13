@@ -1,13 +1,17 @@
-package earleyscala.parser
+package earleyscala
 
-import earleyscala._
 import junit.framework.TestCase
 import org.junit.Assert
+import org.junit.FixMethodOrder
+import org.junit.runners.MethodSorters
+import org.junit.Test
 
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 class testBasicNumericGrammar extends TestCase {
   val TreeUtils = new FullTreeUtils
 
-  def testBasicNumericGrammar_LeftRecursive: Unit = {
+  @Test
+  def test_1_BasicNumericGrammar_LeftRecursive: Unit = {
     /*
     This grammar matches a number. It is a Left Recursive (LR) grammar and the Earley algorithm performs better on LR grammars
     */
@@ -68,7 +72,8 @@ class testBasicNumericGrammar extends TestCase {
     }
   }
 
-  def testBasicNumericGrammar_RightRecursive: Unit = {
+  @Test
+  def test_2_BasicNumericGrammar_RightRecursive: Unit = {
     /*
     This grammar also matches a number but its a Right Recursive (RR) grammar. As demonstrated by the chart output, it takes the Earley algorithm more time to parse a string if the grammar is a RR grammar
      */

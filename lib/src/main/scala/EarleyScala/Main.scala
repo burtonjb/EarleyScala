@@ -40,7 +40,7 @@ object Main {
           A -> '\d'
           +
             1
-          A -> '\d' 
+          A -> '\d'
         A -> A '\+' A
       A -> A '\+' A
     A -> A '\+' A

@@ -15,14 +15,8 @@ case class EarleyState(rule: Rule, dotPosition: Int, startPosition: Int) //scala
 {
   private val _predecessors = new ArrayBuffer[Pointer]()
 
-  def predecessors: ArrayBuffer[Pointer] = _predecessors
-
   def nextSymbol: Option[Symbol] = {
     rule.symbols.lift(dotPosition)
-  }
-
-  def complete: Boolean = {
-    rule.symbols.size == dotPosition
   }
 
   def completeRepr: String = {
@@ -34,25 +28,27 @@ case class EarleyState(rule: Rule, dotPosition: Int, startPosition: Int) //scala
     sb.toString
   }
 
+  def predecessors: ArrayBuffer[Pointer] = _predecessors
+
   def cRepr: String = {
-    s"${repr}\t[${endPosition}]\t${createdFrom}\t"
+    s"${toString}\t[${endPosition}]\t${createdFrom}\t"
   }
 
-  def repr: String = {
+  override def toString: String = {
     val sb = new StringBuilder
     sb.append(rule.name + " -> ")
     rule.symbols.zipWithIndex.foreach(p => {
       val (symbol, index) = p
       if (index == dotPosition) sb.append(" • ")
-      sb.append(" " + symbol.repr + " ")
+      sb.append(" " + symbol.toString + " ")
     })
-    if (complete) sb.append(" • ")
+    if (isComplete) sb.append(" • ")
     sb.append("\t\t(" + startPosition + ")")
     sb.toString
   }
 
-  override def toString: String = {
-    repr
+  def isComplete: Boolean = {
+    rule.symbols.size == dotPosition
   }
 }
 
@@ -60,7 +56,9 @@ case class EarleyState(rule: Rule, dotPosition: Int, startPosition: Int) //scala
 //See SPPF-Style Parsing From Earley Recognisers by Elizabeth Scott
 sealed trait Pointer {
   def label: Int
+
   def from: EarleyState
+
   def to: EarleyState
 }
 
