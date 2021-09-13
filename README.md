@@ -311,9 +311,150 @@ number -> number '[0-9]'
 number -> '[0-9]'
 ```
 
+The earley chart is:
+```
+    ---- 0 ---
+    sum ->  •  sum  '[+-]'  product 		(0)
+    sum ->  •  product 		(0)
+    product ->  •  product  '[/*]'  factor 		(0)
+    product ->  •  factor 		(0)
+    factor ->  •  '\('  sum  '\)' 		(0)
+    factor ->  •  number 		(0)
+    number ->  •  number  '[0-9]' 		(0)
+    number ->  •  '[0-9]' 		(0)
 
+    ---- 1 ---
+    number ->  '[0-9]'  • 		(0)
+    factor ->  number  • 		(0)
+    number ->  number  •  '[0-9]' 		(0)
+    product ->  factor  • 		(0)
+    sum ->  product  • 		(0)
+    product ->  product  •  '[/*]'  factor 		(0)
+    sum ->  sum  •  '[+-]'  product 		(0)
 
-## BNF parsing
+    ---- 2 ---
+    sum ->  sum  '[+-]'  •  product 		(0)
+    product ->  •  product  '[/*]'  factor 		(2)
+    product ->  •  factor 		(2)
+    factor ->  •  '\('  sum  '\)' 		(2)
+    factor ->  •  number 		(2)
+    number ->  •  number  '[0-9]' 		(2)
+    number ->  •  '[0-9]' 		(2)
+
+    ---- 3 ---
+    factor ->  '\('  •  sum  '\)' 		(2)
+    sum ->  •  sum  '[+-]'  product 		(3)
+    sum ->  •  product 		(3)
+    product ->  •  product  '[/*]'  factor 		(3)
+    product ->  •  factor 		(3)
+    factor ->  •  '\('  sum  '\)' 		(3)
+    factor ->  •  number 		(3)
+    number ->  •  number  '[0-9]' 		(3)
+    number ->  •  '[0-9]' 		(3)
+
+    ---- 4 ---
+    number ->  '[0-9]'  • 		(3)
+    factor ->  number  • 		(3)
+    number ->  number  •  '[0-9]' 		(3)
+    product ->  factor  • 		(3)
+    sum ->  product  • 		(3)
+    product ->  product  •  '[/*]'  factor 		(3)
+    factor ->  '\('  sum  •  '\)' 		(2)
+    sum ->  sum  •  '[+-]'  product 		(3)
+
+    ---- 5 ---
+    product ->  product  '[/*]'  •  factor 		(3)
+    factor ->  •  '\('  sum  '\)' 		(5)
+    factor ->  •  number 		(5)
+    number ->  •  number  '[0-9]' 		(5)
+    number ->  •  '[0-9]' 		(5)
+
+    ---- 6 ---
+    number ->  '[0-9]'  • 		(5)
+    factor ->  number  • 		(5)
+    number ->  number  •  '[0-9]' 		(5)
+    product ->  product  '[/*]'  factor  • 		(3)
+    sum ->  product  • 		(3)
+    product ->  product  •  '[/*]'  factor 		(3)
+    factor ->  '\('  sum  •  '\)' 		(2)
+    sum ->  sum  •  '[+-]'  product 		(3)
+
+    ---- 7 ---
+    sum ->  sum  '[+-]'  •  product 		(3)
+    product ->  •  product  '[/*]'  factor 		(7)
+    product ->  •  factor 		(7)
+    factor ->  •  '\('  sum  '\)' 		(7)
+    factor ->  •  number 		(7)
+    number ->  •  number  '[0-9]' 		(7)
+    number ->  •  '[0-9]' 		(7)
+
+    ---- 8 ---
+    number ->  '[0-9]'  • 		(7)
+    factor ->  number  • 		(7)
+    number ->  number  •  '[0-9]' 		(7)
+    product ->  factor  • 		(7)
+    sum ->  sum  '[+-]'  product  • 		(3)
+    product ->  product  •  '[/*]'  factor 		(7)
+    factor ->  '\('  sum  •  '\)' 		(2)
+    sum ->  sum  •  '[+-]'  product 		(3)
+
+    ---- 9 ---
+    factor ->  '\('  sum  '\)'  • 		(2)
+    product ->  factor  • 		(2)
+    sum ->  sum  '[+-]'  product  • 		(0)
+    product ->  product  •  '[/*]'  factor 		(2)
+    sum ->  sum  •  '[+-]'  product 		(0)
+```
+
+Starting from S(9) the [0-indexed, 2]nd rule is the rule that the earley recognizer accepts.
+
+Below is the insanely hard to read parse tree (needs to be read bottom to top, with indentation being used for children). 
+```
+              1
+            number -> '[0-9]'
+          factor -> number
+        product -> factor
+      sum -> product
+      +
+          (
+                      2
+                    number -> '[0-9]'
+                  factor -> number
+                product -> factor
+                *
+                    3
+                  number -> '[0-9]'
+                factor -> number
+              product -> product '[/*]' factor
+            sum -> product
+            -
+                  4
+                number -> '[0-9]'
+              factor -> number
+            product -> factor
+          sum -> sum '[+-]' product
+          )
+        factor -> '\(' sum '\)'
+      product -> factor
+    sum -> sum '[+-]' product
+```
+
+Finally there are some very janky semantic actions, to convert matched rules and expressions to numbers. They're tested and seem to work, and you can see them in the `test_4_ArithmeticGrammar_WithBraces_AndActions` test case.
+
+## Backus–Naur form (BNF) parsing
+
+The final example can be found in the [bnf test cases](./lib/src/test/scala/EarleyScala/testBnfParser.scala) in the `test_5_CompleteBnfGrammar` testcase. 
+
+BNF notation is a notation for describing context-free grammars. Its quite similar to the syntax I used above, but allows people to specify the grammar in a file instead of jankily wiring up grammar objects. I found extended BNF (EBNF) to be more commonly used - like in ANTLR, but its a bit harder to implement. Either BNF or EBNF can be used. 
+
+Non-terminal symbols are enclosed in angle brackets \<like this\> and terminal symbols are enclosed in quotes. Finally instead of having multiple lines defining a rule (so like S->a and S->b) a pipe symbol `|` is used to define a rule with multiple replacements. 
+
+The slightly modified complete grammar can be found in the test case. 
+
+In addition to just parsing the input grammar and outputting a parse tree, BNF is powerful enought that it can define its own grammar in its own notation, which is a common end-goal of any kind of recursive system (similar to a compiler bootstrapping itself). 
+
+The test case linked above can parse the definition of the BNF grammar to output a grammar that can parse BNF grammars that can in theory parse other BNF files. The end-goal would be to have users specify a file containing the grammar definition and a file containing the input text and then the tool would parse the input file using the input grammar (in BNF notation).
+
 
 ## Sources
 * https://en.wikipedia.org/wiki/Earley_parser
