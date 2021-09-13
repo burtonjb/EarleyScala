@@ -6,7 +6,7 @@ import org.junit.FixMethodOrder
 import org.junit.runners.MethodSorters
 import org.junit.Test
 
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+@FixMethodOrder(MethodSorters.NAME_ASCENDING) // don't do this in production, but since these test cases are for demo purposes and ordered from not complex to complex, this is fine.
 class testBasicGrammars extends TestCase {
   val TreeUtil = new DisambiguatingTreeUtils
 
