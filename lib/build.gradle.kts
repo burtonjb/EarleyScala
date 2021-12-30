@@ -49,3 +49,11 @@ tasks.withType<Test> {
     isScanForTestClasses = false
     include("**/*.*")
 }
+
+tasks {
+      val sourcesJar by creating(Jar::class) {
+          archiveClassifier.set("sources")
+          from(sourceSets.main.get().allSource)
+          dependsOn(classes)
+   }
+}
