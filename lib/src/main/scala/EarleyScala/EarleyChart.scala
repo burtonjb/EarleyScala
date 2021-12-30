@@ -51,6 +51,31 @@ class EarleyChart(val grammar: Grammar, val input: String) {
     }).toList
   }
 
+  def getLastRow: Int = {
+    // Find the last row that isn't empty. If the parse failed, this provides an indication
+    // of how far the parser got before it failed to find any more matches.
+    for (pos <- S.indices) {
+      if (S(pos).isEmpty) {
+        return pos - 1
+      }
+    }
+    S.size - 1
+  }
+
+  def getRow(num: Int): List[EarleyState] = {
+    // Return any "interesting" states in the row. Combined with getLastRow() and a failed parse,
+    // this can provide clues about what rule(s) the parser was "in the middle of" when parsing
+    // failed. A state is interesting if it has predecessors because they're likely to be
+    // less ambiguous than single token matches.
+    if (num < 0 || num >= S.size) {
+      ArrayBuffer.empty[EarleyState].toList
+    } else {
+      S(num).filter(state => {
+        state.predecessors.nonEmpty
+      }).toList
+    }
+  }
+
   def repr(): String = {
     repr(earleyState => earleyState.toString + '\n')
   }
