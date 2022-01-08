@@ -76,6 +76,8 @@ case class Earley(grammar: Grammar) {
           S(i).append(newState)
         }
         oldState = newState
+      } else {
+        return // break when the algorithm hits the first non-nullable symbol [walking from the current symbol]
       }
     })
   }
