@@ -76,7 +76,7 @@ case class Grammar(startRuleName: String, rules: Seq[Rule]) {
           nullableSymbols.add(r.name)
         }
         else {
-          if (r.symbols.exists(t => t.isInstanceOf[NonTerminalSymbol] && nullableSymbols.contains(t.asInstanceOf[NonTerminalSymbol].ruleName))) {
+          if (r.symbols.forall(t => t.isInstanceOf[NonTerminalSymbol] && nullableSymbols.contains(t.asInstanceOf[NonTerminalSymbol].ruleName))) {
             nullableSymbols.add(r.name)
           }
         }
